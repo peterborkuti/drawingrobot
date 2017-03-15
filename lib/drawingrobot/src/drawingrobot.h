@@ -9,7 +9,6 @@
 
 #include <Arduino.h>
 #include <AccelStepper.h>
-#include <Servo.h>
 #include <MultiStepper.h>
 
 /**
@@ -18,11 +17,11 @@
  */
 class DrawingRobot {
 private:
-    long pos[2] = {0, 0};
-    MultiStepper s;
     AccelStepper sr;
     AccelStepper sl;
-    Servo servo;
+    MultiStepper s;
+
+    long pos[2];
     float wheel_dia; //      # mm (increase = spiral out)
     float wheel_base; //    # mm (increase = spiral in)
 
@@ -39,12 +38,9 @@ private:
     int getStepsNeeded(float distance);
 
 public:
-    DrawingRobot() {};
-
     /**
      * pinm11..pinm14 : pins for the right motor
      * pinm21..pinm24 : pins for the left motor
-     * pinservo: pin for the servo (penup, pendown)
      * wheel_dia: wheel diameter in millimeters
      * wheel_base: distance between the two wheels in millimeters
      * maxSpeed: maximum speed.
@@ -52,7 +48,7 @@ public:
     DrawingRobot(
         const uint8_t pinm11, const uint8_t pinm12, const uint8_t pinm13, const uint8_t pinm14,
         const uint8_t pinm21, const uint8_t pinm22, const uint8_t pinm23, const uint8_t pinm24,
-        const uint8_t pinservo, const float _wheel_dia, const float _wheel_base, const float maxSpeed);
+        const float _wheel_dia, const float _wheel_base, const float maxSpeed);
 
     /**
     * make lsteps with left motor and rsteps with the right motor.
@@ -62,14 +58,6 @@ public:
     * @param rSteps steps for the right motor
     */
     void goMotor(int lSteps, int rSteps);
-    /**
-     * puts down the pen
-     */
-    void pendown();
-    /**
-     * pulls up the pen
-     */
-    void penup();
     /**
      * turns left in place with a given degrees
      * @param degrees degrees of turning, positive number

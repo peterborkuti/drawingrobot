@@ -1,0 +1,13 @@
+DrawingRobot	KEYWORD1
+goMotor	KEYWORD2
+left	KEYWORD2
+right	KEYWORD2
+forward	KEYWORD2
+backward	KEYWORD2
+penup	KEYWORD2
+pendown	KEYWORD2
+getWheelDia	KEYWORD2
+getWheelBase	KEYWORD2
+setCarParams	KEYWORD2
+arcleft	KEYWORD2
+arcright	KEYWORD2

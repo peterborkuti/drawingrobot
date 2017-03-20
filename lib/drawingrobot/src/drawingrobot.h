@@ -33,9 +33,11 @@ private:
 
     float oneStepLength;
 
-    float quarter_base;
-    float getLength(float degree);
-    int getStepsNeeded(float distance);
+    float half_base;
+    float degreesToRadians(const float degrees) const;
+    float getArcLength(const float degrees, const float radius) const;
+    int getSteps(const float distance, const float stepLength) const;
+
 
 public:
     /**
@@ -78,6 +80,27 @@ public:
      * @param mm millimeters to move
      */
     void backward(const float mm);
+
+    void leftarc(const float degrees, const float radius);
+    void rightarc(const float degrees, const float radius);
+    /**
+    * gets wheel diameter
+    * @return wheel diameter in mm
+    */
+    float getWheelDia() const;
+
+    /**
+     * gets the distance between the two wheels
+     * @return wheel base in mm
+     */
+    float getWheelBase() const;
+
+    /**
+     * sets the wheel diameter and wheel base
+     * @param _wheel_dia  diameter in mm
+     * @param _wheel_base base in mm
+     */
+    void setCarParams(const float _wheel_dia, const float _wheel_base);
 };
 
 #endif

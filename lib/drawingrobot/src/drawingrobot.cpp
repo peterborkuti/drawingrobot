@@ -20,32 +20,28 @@ DrawingRobot::DrawingRobot(
     s.addStepper(sr);
     //Serial.println("E");
 
-    wheel_base = _wheel_base;
-    wheel_dia = _wheel_dia;
-
     //FULL4WIRE
     steps_rev = 2048; //,     # 512 for 64x gearbox, 128 for 16x gearbox
 
     //HALF4WIRE
     //float const steps_rev=4096;
 
-    oneStepLength = 2.0 * PI * wheel_dia / 2.0 / steps_rev;
-
-    quarter_base = wheel_base / 2.0;
-    //Serial.println("F");
+    setCarParams(_wheel_dia, _wheel_base);
 }
 
-float DrawingRobot::getLength(float degree) {
-    float radian = 2.0 * PI * degree / 360.0;
-
-    return radian * quarter_base;
+float DrawingRobot::degreesToRadians(const float degrees) const {
+    return degrees * PI / 180.0;
 }
 
-int DrawingRobot::getStepsNeeded(float distance) {
-    return (int)(distance / oneStepLength + 0.5);
+float DrawingRobot::getArcLength(const float degrees, const float radius) const {
+    return radius * degreesToRadians(degrees);
 }
 
-void DrawingRobot::goMotor(int lSteps, int rSteps) {
+int DrawingRobot::getSteps(const float distance, const float stepLength) const {
+    return (int)(distance / stepLength + 0.5);
+}
+
+void DrawingRobot::goMotor(const int lSteps, const int rSteps) {
     sl.setCurrentPosition(0);
     sr.setCurrentPosition(0);
     pos[0] = lSteps;
@@ -56,24 +52,63 @@ void DrawingRobot::goMotor(int lSteps, int rSteps) {
 }
 
 void DrawingRobot::forward(const float distance){
-  int steps = getStepsNeeded(distance);
+  int steps = getSteps(distance, oneStepLength);
   Serial.println(steps);
   goMotor(-steps, steps);
 }
 
 void DrawingRobot::backward(const float distance){
-  int steps = getStepsNeeded(distance);
+  int steps = getSteps(distance, oneStepLength);
   goMotor(steps, -steps);
 }
 
 void DrawingRobot::right(const float degrees){
-  float distance = getLength(degrees);
-  int steps = getStepsNeeded(distance);
+  float distance = getArcLength(degrees, half_base);
+  int steps = getSteps(distance, oneStepLength);
   goMotor(-steps, -steps);
 }
 
 void DrawingRobot::left(const float degrees){
-    float distance = getLength(degrees);
-    int steps = getStepsNeeded(distance);
+    float distance = getArcLength(degrees, half_base);
+    int steps = getSteps(distance, oneStepLength);
     goMotor(steps, steps);
+}
+
+void DrawingRobot::rightarc(const float degrees, const float radius) {
+    float outerArcLength = getArcLength(degrees, radius + half_base);
+    float innerArcLength = getArcLength(degrees, radius - half_base);
+
+    int lsteps = getSteps(outerArcLength, oneStepLength);
+    int rsteps = getSteps(innerArcLength, oneStepLength);
+
+    //both motors go forward
+    goMotor(-lsteps, rsteps);
+}
+
+void DrawingRobot::leftarc(const float degrees, const float radius) {
+    float outerArcLength = getArcLength(degrees, radius + half_base);
+    float innerArcLength = getArcLength(degrees, radius - half_base);
+
+    int rsteps = getSteps(outerArcLength, oneStepLength);
+    int lsteps = getSteps(innerArcLength, oneStepLength);
+
+    //both motors go forward
+    goMotor(-lsteps, rsteps);
+}
+
+float DrawingRobot::getWheelDia() const {
+    return wheel_dia;
+}
+
+float DrawingRobot::getWheelBase() const {
+    return wheel_base;
+}
+
+void DrawingRobot::setCarParams(const float _wheel_dia, const float _wheel_base) {
+    wheel_dia = _wheel_dia;
+    wheel_base = _wheel_base;
+
+    oneStepLength = PI * wheel_dia / steps_rev;
+
+    half_base = wheel_base / 2.0;
 }

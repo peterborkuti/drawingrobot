@@ -5,6 +5,7 @@
 
 #include <drawingrobot.h>
 #include <Servo.h>
+#include <TM1638.h>
 
 // EG X-Y position bed driven by 2 steppers
 // Alas its not possible to build an array of these with different pins for each :-(
@@ -16,11 +17,17 @@
 //AccelStepper sl(AccelStepper::FULL4WIRE, 9, 11, 10, 12);
 
 Servo servo;
+TM1638 module(8,7,13); //data(dont use pin13 on nano), clock, strobe
+
+void penup();
 
 void setup() {
   Serial.begin(9600);
   servo.attach(6);
+  penup();
+  module.setDisplayToString("Hello");
 }
+
 
 DrawingRobot robot(
     2, 3, 4, 5,
@@ -35,9 +42,14 @@ void pendown() {
     servo.write(150);
 }
 
-
+byte pos = 0;
 void loop() {
+  byte keys = module.getButtons();
+  module.setLEDs(keys);
 
+  //byte keys = module.getButtons();
+  //module.setLEDs(((keys & 0xF0) << 8) | (keys & 0xF));
+/*
   Serial.println("1");
   robot.left(90);
   delay(1000);
@@ -46,4 +58,5 @@ void loop() {
   pendown();
 
   Serial.println("2");
+  */
 }
